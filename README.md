@@ -1,4 +1,4 @@
-# ⚡ Suíte de Otimização All-in-One (CoreIsolator + Tweaks)
+#  Suíte de Otimização All-in-One (CoreIsolator + Tweaks)
 
 Esta aplicação é a unificação de dois projetos poderosos para otimização do Windows:
 1. **CoreIsolator**: Um gerenciador avançado de afinidade de CPU (WPF / .NET 8) que isola núcleos do processador para jogos e aplicações de alta performance.
@@ -6,7 +6,7 @@ Esta aplicação é a unificação de dois projetos poderosos para otimização 
 
 Tudo isso envelopado em uma única interface moderna, rápida e assíncrona, conectada a um serviço de telemetria na nuvem para métricas de sucesso.
 
-## 🚀 Funcionalidades
+##  Funcionalidades
 
 - **Gerenciamento de CPU**: Detecção de topologia (P-Cores e E-Cores em processadores Intel) e isolamento de processos em tempo real via P/Invoke.
 - **Limpeza e Tweaks Integrados**: Execução segura e não-bloqueante de scripts PowerShell (como o `Otimizador_Windows.ps1`) com captura de logs em tempo real na interface gráfica.
@@ -17,7 +17,7 @@ Tudo isso envelopado em uma única interface moderna, rápida e assíncrona, con
   - Processamento Assíncrono Avançado (`IAsyncEnumerable`, `System.Threading.Channels`).
 - **Telemetria Serverless**: Cliente HTTP com `IHttpClientFactory` que se comunica com uma API Node.js (Vercel) usando chamadas *fire-and-forget*.
 
-## 🛠️ Como Executar e Compilar
+##  Como Executar e Compilar
 
 ### Pré-requisitos
 - [SDK do .NET 8](https://dotnet.microsoft.com/download/dotnet/8.0)
@@ -33,7 +33,7 @@ Tudo isso envelopado em uma única interface moderna, rápida e assíncrona, con
 3. A aplicação será aberta. Você pode acessá-la pela Bandeja do Sistema (System Tray) ou diretamente pela janela principal.
 4. Para acessar a nova suíte de limpeza, clique no botão **"🛠️ Otimizar PC"** na barra de título.
 
-## 📁 Estrutura do Projeto
+##  Estrutura do Projeto
 
 - `/Scripts`: Contém os artefatos em PowerShell `.ps1` que são copiados para a pasta de saída durante a compilação.
 - `/Services`: Orquestradores assíncronos (`PowerShellRunnerService`, `TelemetryClient`).

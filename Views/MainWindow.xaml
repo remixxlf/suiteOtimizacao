@@ -16,7 +16,6 @@
         MouseLeftButtonDown="Window_MouseLeftButtonDown">
 
     <Window.Resources>
-        <!-- Converter para visibilidade booleana -->
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </Window.Resources>
 
@@ -47,11 +46,10 @@
                                    VerticalAlignment="Center" />
                     </StackPanel>
 
-                    <!-- Botões da janela -->
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,8,0">
-                        <!-- Novo Botão de Otimização -->
+                        <!-- O Command faz o binding direto com o método OpenTweaksWindow do ViewModel -->
                         <Button x:Name="TweaksButton" Content="🛠️ Otimizar PC" 
-                                Click="TweaksButton_Click"
+                                Command="{Binding OpenTweaksWindowCommand}"
                                 Height="28" Padding="12,0" Margin="0,0,12,0" FontSize="12"
                                 FontWeight="SemiBold"
                                 Foreground="{StaticResource CrustBrush}"
@@ -109,15 +107,13 @@
             <!-- ══════════════════════════════════════════ -->
             <Grid Grid.Row="1" Margin="20,16,20,8">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />      <!-- Coluna esquerda -->
-                    <ColumnDefinition Width="16" />     <!-- Espaçamento -->
-                    <ColumnDefinition Width="340" />    <!-- Coluna direita (Perfis + Log) -->
+                    <ColumnDefinition Width="*" />      
+                    <ColumnDefinition Width="16" />     
+                    <ColumnDefinition Width="340" />    
                 </Grid.ColumnDefinitions>
 
-                <!-- ─── COLUNA ESQUERDA ─── -->
                 <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel>
-
                         <!-- Card: Status do Sistema -->
                         <Border Style="{StaticResource CardPanel}">
                             <StackPanel>
@@ -126,21 +122,20 @@
                                         <TextBlock Style="{StaticResource SectionTitle}" Text="🖥️ Status do Sistema" />
                                         <TextBlock x:Name="CpuNameText" 
                                                    Style="{StaticResource SubtitleText}" 
-                                                   Text="Detectando CPU..." />
+                                                   Text="{Binding Topology.CpuName, TargetNullValue='Detectando CPU...'}" />
                                     </StackPanel>
-                                    <!-- Badge de status -->
                                     <Border x:Name="StatusBadge" 
                                             HorizontalAlignment="Right" VerticalAlignment="Top"
                                             Style="{StaticResource StatusBadge}"
                                             Background="{StaticResource Surface1Brush}">
+                                        <!-- O Badge Text reage automaticamente ao estado do ViewModel -->
                                         <TextBlock x:Name="StatusBadgeText" 
-                                                   Text="⏸ Idle" 
+                                                   Text="{Binding StatusBadgeText}" 
                                                    Foreground="{StaticResource SubtextBrush}" 
                                                    FontSize="12" FontWeight="SemiBold" />
                                     </Border>
                                 </Grid>
 
-                                <!-- Contagem de cores -->
                                 <Grid Margin="0,12,0,0">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
@@ -148,39 +143,39 @@
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
 
-                                    <!-- P-Cores -->
+                                    <!-- P-Cores Binding -->
                                     <Border Grid.Column="0" Background="{StaticResource MantleBrush}" 
                                             CornerRadius="8" Padding="12,10" Margin="0,0,6,0">
                                         <StackPanel HorizontalAlignment="Center">
                                             <TextBlock Text="P-Cores" Foreground="{StaticResource BlueAccentBrush}" 
                                                        FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Center" />
-                                            <TextBlock x:Name="PCoreCountText" Text="—" 
+                                            <TextBlock x:Name="PCoreCountText" Text="{Binding Topology.PCores.Count}" 
                                                        Foreground="{StaticResource TextBrush}" 
                                                        FontSize="28" FontWeight="Bold" HorizontalAlignment="Center" 
                                                        FontFamily="Segoe UI Variable Display" />
                                         </StackPanel>
                                     </Border>
 
-                                    <!-- E-Cores -->
+                                    <!-- E-Cores Binding -->
                                     <Border Grid.Column="1" Background="{StaticResource MantleBrush}" 
                                             CornerRadius="8" Padding="12,10" Margin="3,0">
                                         <StackPanel HorizontalAlignment="Center">
                                             <TextBlock Text="E-Cores" Foreground="{StaticResource GreenAccentBrush}" 
                                                        FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Center" />
-                                            <TextBlock x:Name="ECoreCountText" Text="—" 
+                                            <TextBlock x:Name="ECoreCountText" Text="{Binding Topology.ECores.Count}" 
                                                        Foreground="{StaticResource TextBrush}" 
                                                        FontSize="28" FontWeight="Bold" HorizontalAlignment="Center" 
                                                        FontFamily="Segoe UI Variable Display" />
                                         </StackPanel>
                                     </Border>
 
-                                    <!-- Threads -->
+                                    <!-- Threads Binding -->
                                     <Border Grid.Column="2" Background="{StaticResource MantleBrush}" 
                                             CornerRadius="8" Padding="12,10" Margin="6,0,0,0">
                                         <StackPanel HorizontalAlignment="Center">
                                             <TextBlock Text="Threads" Foreground="{StaticResource MauveAccentBrush}" 
                                                        FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Center" />
-                                            <TextBlock x:Name="ThreadCountText" Text="—" 
+                                            <TextBlock x:Name="ThreadCountText" Text="{Binding Topology.TotalLogicalProcessors}" 
                                                        Foreground="{StaticResource TextBrush}" 
                                                        FontSize="28" FontWeight="Bold" HorizontalAlignment="Center" 
                                                        FontFamily="Segoe UI Variable Display" />
@@ -190,44 +185,16 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- Card: Topologia dos Núcleos -->
-                        <Border Style="{StaticResource CardPanel}">
-                            <StackPanel>
-                                <TextBlock Style="{StaticResource SectionTitle}" Text="🧮 Topologia dos Núcleos" />
-                                <TextBlock Style="{StaticResource SubtitleText}" 
-                                           Text="Visualização da distribuição de núcleos do processador" />
-
-                                <!-- Grid visual dos núcleos (gerado dinamicamente no code-behind) -->
-                                <WrapPanel x:Name="CoreVisualizationPanel" 
-                                           Margin="0,12,0,0"
-                                           HorizontalAlignment="Left" />
-
-                                <!-- Legenda -->
-                                <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
-                                    <Border Background="{StaticResource PCoreBadgeGradient}" 
-                                            CornerRadius="4" Width="14" Height="14" Margin="0,0,6,0" />
-                                    <TextBlock Text="P-Core" Foreground="{StaticResource SubtextBrush}" 
-                                               FontSize="11" VerticalAlignment="Center" Margin="0,0,16,0" />
-                                    <Border Background="{StaticResource ECoreBadgeGradient}" 
-                                            CornerRadius="4" Width="14" Height="14" Margin="0,0,6,0" />
-                                    <TextBlock Text="E-Core" Foreground="{StaticResource SubtextBrush}" 
-                                               FontSize="11" VerticalAlignment="Center" Margin="0,0,16,0" />
-                                    <Border Background="{StaticResource Surface2Brush}" 
-                                            CornerRadius="4" Width="14" Height="14" Margin="0,0,6,0" />
-                                    <TextBlock Text="HT Thread" Foreground="{StaticResource SubtextBrush}" 
-                                               FontSize="11" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </StackPanel>
-                        </Border>
-
                         <!-- Card: Jogo Ativo (visível apenas quando um jogo está isolado) -->
-                        <Border x:Name="ActiveGameCard" Style="{StaticResource CardPanel}" Visibility="Collapsed"
+                        <Border x:Name="ActiveGameCard" Style="{StaticResource CardPanel}" 
+                                Visibility="{Binding IsActiveGameCardVisible, Converter={StaticResource BoolToVis}}"
                                 BorderBrush="{StaticResource GreenAccentBrush}" BorderThickness="1">
                             <StackPanel>
                                 <Grid>
                                     <StackPanel>
                                         <TextBlock Style="{StaticResource SectionTitle}" Text="🎮 Jogo Ativo" />
                                         <TextBlock x:Name="ActiveGameNameText" 
+                                                   Text="{Binding ActiveGameName}"
                                                    Foreground="{StaticResource GreenAccentBrush}" 
                                                    FontSize="18" FontWeight="Bold" 
                                                    FontFamily="Segoe UI Variable Display" />
@@ -249,7 +216,7 @@
                                     <StackPanel Grid.Column="0">
                                         <TextBlock Text="Máscara de Afinidade" 
                                                    Foreground="{StaticResource SubtextBrush}" FontSize="11" />
-                                        <TextBlock x:Name="ActiveAffinityText" Text="0x00FF" 
+                                        <TextBlock x:Name="ActiveAffinityText" Text="{Binding ActiveAffinityText}" 
                                                    Foreground="{StaticResource TextBrush}" FontSize="14" 
                                                    FontFamily="Cascadia Code, Consolas" FontWeight="SemiBold" />
                                     </StackPanel>
@@ -268,30 +235,27 @@
                         <Border Style="{StaticResource CardPanel}">
                             <StackPanel>
                                 <TextBlock Style="{StaticResource SectionTitle}" Text="⚙️ Configurações" />
+                                <!-- Bindings nos CheckBoxes substituem a necessidade de eventos Checked no Code-Behind -->
                                 <CheckBox x:Name="AutoStartCheckBox" 
                                           Style="{StaticResource DarkCheckBox}" 
                                           Content="Iniciar com o Windows (via Agendador de Tarefas)"
                                           Margin="0,4" 
-                                          Checked="AutoStartCheckBox_Changed" 
-                                          Unchecked="AutoStartCheckBox_Changed" />
+                                          IsChecked="{Binding Settings.AutoStartWithWindows, Mode=TwoWay}" />
                                 <CheckBox x:Name="RestoreAffinityCheckBox" 
                                           Style="{StaticResource DarkCheckBox}" 
                                           Content="Restaurar afinidade ao fechar o jogo" 
-                                          IsChecked="True" Margin="0,4"
-                                          Checked="RestoreAffinityCheckBox_Changed"
-                                          Unchecked="RestoreAffinityCheckBox_Changed" />
+                                          Margin="0,4"
+                                          IsChecked="{Binding Settings.RestoreAffinityOnGameClose, Mode=TwoWay}" />
                                 <CheckBox x:Name="ShowNotificationsCheckBox" 
                                           Style="{StaticResource DarkCheckBox}" 
                                           Content="Exibir notificações na bandeja" 
-                                          IsChecked="True" Margin="0,4"
-                                          Checked="ShowNotificationsCheckBox_Changed"
-                                          Unchecked="ShowNotificationsCheckBox_Changed" />
+                                          Margin="0,4"
+                                          IsChecked="{Binding Settings.ShowNotifications, Mode=TwoWay}" />
                                 <CheckBox x:Name="MinimizeOnStartCheckBox" 
                                           Style="{StaticResource DarkCheckBox}" 
                                           Content="Iniciar minimizado na bandeja" 
-                                          IsChecked="True" Margin="0,4"
-                                          Checked="MinimizeOnStartCheckBox_Changed"
-                                          Unchecked="MinimizeOnStartCheckBox_Changed" />
+                                          Margin="0,4"
+                                          IsChecked="{Binding Settings.MinimizeToTrayOnStart, Mode=TwoWay}" />
                             </StackPanel>
                         </Border>
                     </StackPanel>
@@ -305,7 +269,6 @@
                         <RowDefinition Height="220" />   <!-- Log de Atividade -->
                     </Grid.RowDefinitions>
 
-                    <!-- Card: Perfis de Jogos -->
                     <Border Grid.Row="0" Style="{StaticResource CardPanel}">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -320,10 +283,11 @@
                                            Text="Executáveis monitorados para isolamento automático" />
                             </StackPanel>
 
-                            <!-- Lista de Perfis -->
                             <ListBox x:Name="ProfileListBox" Grid.Row="1" 
                                      Style="{StaticResource DarkListBox}" 
                                      Margin="0,8,0,8"
+                                     ItemsSource="{Binding Profiles}"
+                                     SelectedItem="{Binding SelectedProfile}"
                                      ItemContainerStyle="{StaticResource DarkListBoxItem}">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
@@ -352,7 +316,6 @@
                                 </ListBox.ItemTemplate>
                             </ListBox>
 
-                            <!-- Botões de ação -->
                             <Grid Grid.Row="2">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
@@ -360,24 +323,28 @@
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
 
-                                <!-- Adicionar perfil -->
+                                <!-- Inputs ligadas ao ViewModel -->
                                 <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="0,0,8,0">
                                     <TextBox x:Name="NewGameNameBox" 
                                              Style="{StaticResource DarkTextBox}" 
                                              Width="100" Margin="0,0,4,0"
+                                             Text="{Binding NewProfileName, UpdateSourceTrigger=PropertyChanged}"
                                              Tag="Nome do jogo" />
                                     <TextBox x:Name="NewGameExeBox" 
                                              Style="{StaticResource DarkTextBox}" 
                                              Width="110" Margin="0,0,4,0"
+                                             Text="{Binding NewProfileExe, UpdateSourceTrigger=PropertyChanged}"
                                              Tag="exe (ex: cs2.exe)" />
                                 </StackPanel>
+                                
                                 <Button Grid.Column="1" Content="＋ Adicionar" 
                                         Style="{StaticResource PrimaryButton}" 
-                                        Click="AddProfile_Click"
+                                        Command="{Binding AddProfileCommand}"
                                         Padding="12,6" FontSize="12" />
+                                
                                 <Button Grid.Column="2" Content="🗑" 
                                         Style="{StaticResource DangerButton}" 
-                                        Click="RemoveProfile_Click"
+                                        Command="{Binding RemoveProfileCommand}"
                                         HorizontalAlignment="Right"
                                         Padding="8,6" FontSize="12" Width="36" />
                             </Grid>
@@ -396,7 +363,7 @@
                                 <TextBlock Style="{StaticResource SectionTitle}" Text="📋 Log de Atividade" />
                                 <Button Content="Limpar" 
                                         Style="{StaticResource SecondaryButton}" 
-                                        Click="ClearLog_Click"
+                                        Command="{Binding ClearLogCommand}"
                                         HorizontalAlignment="Right" 
                                         Padding="10,4" FontSize="11" />
                             </Grid>
@@ -404,6 +371,7 @@
                             <ListBox x:Name="LogListBox" Grid.Row="1" 
                                      Style="{StaticResource DarkListBox}"
                                      Margin="0,4,0,0"
+                                     ItemsSource="{Binding Logs}"
                                      FontFamily="Cascadia Code, Cascadia Mono, Consolas"
                                      FontSize="11"
                                      Foreground="{StaticResource SubtextBrush}" />
@@ -421,11 +389,12 @@
                         <Ellipse x:Name="StatusDot" Width="8" Height="8" 
                                  Fill="{StaticResource GreenAccentBrush}" Margin="0,0,8,0" />
                         <TextBlock x:Name="StatusBarText" 
-                                   Text="Monitoramento ativo — aguardando jogo..." 
+                                   Text="{Binding StatusBarText}" 
                                    Foreground="{StaticResource SubtextBrush}" 
                                    FontSize="11" VerticalAlignment="Center" />
                     </StackPanel>
                     <TextBlock x:Name="MaskInfoText" 
+                               Text="{Binding MaskInfoText}"
                                HorizontalAlignment="Right" VerticalAlignment="Center"
                                Foreground="{StaticResource OverlayBrush}" 
                                FontSize="11" FontFamily="Cascadia Code, Consolas" />

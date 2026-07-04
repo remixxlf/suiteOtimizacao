@@ -25,9 +25,21 @@ public partial class App : Application
         AppHost = Host.CreateDefaultBuilder()
             .ConfigureServices((hostContext, services) =>
             {
-                services.AddSingleton<MainWindow>();
+                // -- Modificação (DIDÁTICA): Registro de Serviços (Dependency Injection) --
+                // O ServiceCollection atua como um contêiner. Registramos nossas classes aqui para que o 
+                // framework saiba como criá-las quando precisarmos delas.
+                
+                // AddSingleton: Cria uma única instância para toda a vida da aplicação. Útil para gerenciadores de estado.
+                services.AddSingleton<ProfileManager>();
+                services.AddSingleton<CoreIsolatorEngine>();
+                
+                // AddTransient: Cria uma nova instância toda vez que for solicitado. Útil para Janelas e ViewModels independentes.
+                services.AddTransient<MainViewModel>();
+                services.AddTransient<MainWindow>();
                 services.AddTransient<TweaksViewModel>();
                 services.AddTransient<TweaksWindow>();
+                
+                // Interface para Implementação: Sempre que alguém pedir um IPowerShellRunnerService, entregamos um PowerShellRunnerService.
                 services.AddTransient<IPowerShellRunnerService, PowerShellRunnerService>();
                 
                 services.AddHttpClient<ITelemetryClient, TelemetryClient>(client =>
@@ -51,6 +63,12 @@ public partial class App : Application
         // Inicializar o ícone da bandeja do sistema
         _trayIcon = (TaskbarIcon)FindResource("TrayIcon");
 
+        // -- Modificação (DIDÁTICA): Forçando a renderização do ícone --
+        // Como instanciamos o TaskbarIcon dentro de um ResourceDictionary (Application.Resources),
+        // ele não está contido numa Janela ativa, então o Windows pode não saber que deve exibi-lo.
+        // O ForceCreate() diz diretamente à API do Windows: "Ei, construa este ícone na bandeja agora mesmo!".
+        _trayIcon?.ForceCreate();
+
         // Criar e exibir a janela principal via Injeção de Dependência
         _mainWindow = AppHost.Services.GetRequiredService<MainWindow>();
         _mainWindow.Show();
@@ -61,6 +79,10 @@ public partial class App : Application
     /// </summary>
     private void ShowWindow_Click(object sender, RoutedEventArgs e)
     {
+        // -- Modificação (DIDÁTICA): Restauração da Janela --
+        // Quando minimizamos para a bandeja, apenas escondemos a janela (Hide() e ShowInTaskbar = false).
+        // Para trazê-la de volta, chamamos o método RestoreWindow() que nós mesmos criamos na MainWindow,
+        // que se encarrega de dar o Show(), reativar a visibilidade na barra de tarefas (ShowInTaskbar = true) e focar (Activate).
         if (_mainWindow != null)
         {
             _mainWindow.RestoreWindow();
@@ -88,6 +110,9 @@ public partial class App : Application
     /// </summary>
     private void TrayIcon_TrayLeftMouseDown(object sender, RoutedEventArgs e)
     {
+        // -- Modificação (DIDÁTICA): Clique direto no ícone --
+        // Reutilizamos a lógica de restaurar a janela. Assim, o usuário pode tanto usar
+        // o Menu de Contexto (botão direito > Mostrar) quanto dar um simples clique esquerdo no ícone da bandeja.
         if (_mainWindow != null)
         {
             _mainWindow.RestoreWindow();

@@ -25,7 +25,17 @@
                 <MenuItem Header="❌ Sair" Click="ExitApp_Click" />
             </ContextMenu>
 
+            <!-- 
+                Modificação (DIDÁTICA): Configuração do System Tray (TaskbarIcon)
+                1. IconSource: Define a imagem que aparecerá ao lado do relógio. Se isso não for definido, 
+                   o componente existe na memória, mas não tem rosto, logo, "some". 
+                   Usamos um caminho Pack URI para pegar o ícone de dentro do executável.
+                   *(Nota: Certifique-se de ter um arquivo 'icon.ico' na pasta Resources).*
+                2. Visibility: Garante explicitamente que o ícone está visível.
+            -->
             <tb:TaskbarIcon x:Key="TrayIcon"
+                            IconSource="pack://application:,,,/Resources/icon.ico"
+                            Visibility="Visible"
                             ToolTipText="CoreIsolator — Isolador de Núcleos"
                             ContextMenu="{StaticResource TrayContextMenu}"
                             TrayLeftMouseDown="TrayIcon_TrayLeftMouseDown" />

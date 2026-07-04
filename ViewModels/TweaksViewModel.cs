@@ -32,9 +32,9 @@ public partial class TweaksViewModel : ObservableObject
 
         try
         {
-            string scriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts", "Otimizador_Windows.ps1");
+            string resourceName = "CoreIsolator.Scripts.Otimizador_Windows.ps1";
 
-            await foreach (var line in _powerShellRunner.RunScriptAsync(scriptPath, cancellationToken))
+            await foreach (var line in _powerShellRunner.RunEmbeddedScriptAsync(resourceName, cancellationToken))
             {
                 StatusText += line + Environment.NewLine;
                 logBuilder.AppendLine(line);

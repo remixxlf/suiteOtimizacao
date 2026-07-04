@@ -1,4 +1,4 @@
-#Requires -RunAsAdministrator
+﻿#Requires -RunAsAdministrator
 <#
 ╔══════════════════════════════════════════════════════════════════════╗
 ║               OTIMIZADOR WINDOWS v2.0 - COMMUNITY EDITION           ║

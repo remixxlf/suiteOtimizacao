@@ -6,6 +6,7 @@
 
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Security.Principal;
 using CoreIsolator.Native;
 
 namespace CoreIsolator.Services;
@@ -41,21 +42,41 @@ public static class PrivilegeManager
     /// </summary>
     private const uint TOKEN_QUERY = 0x0008;
 
+    // -- Modificação (DIDÁTICA): Verificação de Segurança (Administrador) --
+    // Este método verifica preventivamente se o usuário atual executou a aplicação com
+    // privilégios elevados (Executar como Administrador).
+    public static bool IsAdministrator()
+    {
+        try
+        {
+            using var identity = WindowsIdentity.GetCurrent();
+            var principal = new WindowsPrincipal(identity);
+            return principal.IsInRole(WindowsBuiltInRole.Administrator);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[PrivilegeManager] Erro ao verificar status de administrador: {ex.Message}");
+            return false;
+        }
+    }
+
     /// <summary>
     /// Habilita o privilégio SeDebugPrivilege no processo atual.
-    /// Esse privilégio é necessário para abrir e manipular processos do sistema
-    /// e de outros usuários, incluindo definir afinidade de CPU e prioridade.
     /// </summary>
-    /// <returns>
-    /// <c>true</c> se o privilégio foi habilitado com sucesso;
-    /// <c>false</c> caso contrário (ex.: o processo não está sendo executado como administrador).
-    /// </returns>
     public static bool EnableDebugPrivilege()
     {
+        // 1. Validação Preventiva
+        if (!IsAdministrator())
+        {
+            Debug.WriteLine("[PrivilegeManager] O processo não possui privilégios de Administrador. Abortando elevação.");
+            return false;
+        }
+
         IntPtr tokenHandle = IntPtr.Zero;
 
         try
         {
+            // 2. Chamadas nativas (P/Invoke) protegidas em try/catch
             // Obtém o handle do processo atual
             IntPtr processHandle = NativeMethods.GetCurrentProcess();
 
